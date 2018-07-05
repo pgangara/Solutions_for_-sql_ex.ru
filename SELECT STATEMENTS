@@ -66,3 +66,120 @@ Sol: Select distinct maker
                                   from product 
                                   where type = 'laptop')
      and type = 'PC'
+     
+9. Find the makers of PCs with a processor speed of 450 MHz or more. Result set: maker.
+
+Sol: SELECT distinct (prod. Maker)
+     From Product as prod
+     LEFT JOIN PC as p on p.model = prod.model
+     WHERE  p.speed >= 450
+     
+10. Find the printer models having the highest price. Result set: model, price.
+
+Sol: SELECT Model, Price
+     FROM Printer 
+     WHERE price = (SELECT MAX(PRICE)
+                            FROM Printer)
+                            
+11. Find out the average speed of PCs.
+
+Sol. SELECT AVG(Speed)
+     FROM PC
+     
+12. Find out the average speed of the laptops priced over $1000.
+
+Sol. SELECT AVG(Speed) as Avg_Speed
+     FROM Laptop
+     WHERE Price >= 1000
+     
+13. Find out the average speed of the PCs produced by maker A.
+
+Sol. SELECT Avg(pc.Speed)
+     FROM PC as pc
+     LEFT JOIN Product as prod on prod.model = pc. model
+     WHERE prod.maker = 'A'
+     
+14. Get the makers who produce only one product type and more than one model. Output: maker, type.
+ 
+Sol. SELECT maker, MAX(type) AS type 
+     FROM product 
+     GROUP BY maker 
+     HAVING COUNT(DISTINCT type) = 1 AND COUNT(model) > 1
+
+15. Get hard drive capacities that are identical for two or more PCs. Result set: hd.
+
+Sol. SELECT max(hd) as hd
+     FROM PC as pc
+     GROUP BY hd
+     Having count(*)>1
+
+16. Get pairs of PC models with identical speeds and the same RAM capacity. Each resulting pair should be displayed only once, i.e. (i, j) but not (j, i). 
+    Result set: model with the bigger number, model with the smaller number, speed, and RAM.
+
+Sol. SELECT p1.Model, p2.Model, p1.speed, p1.ram
+     FROM PC as p1, PC as p2
+     WHERE p1.model >p2.model
+     AND p1.speed = p2.speed 
+     AND p1.ram = p2.ram
+
+17. Get the laptop models that have a speed smaller than the speed of any PC. Result set: type, model, speed.
+
+Sol. SELECT Product.Type, laptop.Model, laptop.Speed
+     FROM Laptop, Product 
+     WHERE Laptop.model = Product.model
+     AND  Laptop.speed<(SELECT MIN(SPEED)
+                        FROM PC )
+                        
+18. Find the makers of the cheapest color printers.Result set: maker, price. 
+
+Sol. SELECT distinct (Maker), Price
+     FROM Printer, Product
+     WHERE Printer.Model = Product.Model
+     AND Printer. Price = (SELECT Min(Price)
+                                    FROM Printer
+                                    WHERE color = 'y' )
+     AND Printer.color = 'y'
+     
+19. For each maker having models in the Laptop table, find out the average screen size of the laptops he produces. Result set: maker, average screen size.     
+
+Sol. SELECT Product.Maker, AVG(Laptop.Screen)
+     FROM Laptop, Product
+     WHERE Laptop.Model = Product.Model
+     GROUP BY Product.Maker
+
+20. Find the makers producing at least three distinct models of PCs. Result set: maker, number of PC models.
+
+Sol. SELECT distinct(Maker), count(Model) as No_of_Models
+     FROM Product
+     WHERE Type = 'PC'
+     GROUP BY Maker
+     Having COUNT(Model)>=3
+     
+21. Find out the maximum PC price for each maker having models in the PC table. Result set: maker, maximum price.
+
+Sol. SELECT distinct(Product.Maker), Max(PC.Price) as Max_Price
+     FROM PC, Product
+     WHERE Product.Model = PC.Model
+     GROUP BY Product.Maker
+     
+22. For each value of PC speed that exceeds 600 MHz, find out the average price of PCs with identical speeds. Result set: speed, average price.
+
+Sol. SELECT p1.Speed, Avg(p1.Price) as Average_Price
+     FROM PC as p1
+     WHERE p1.Speed > 600
+     GROUP BY p1.speed
+
+23. Get the makers producing both PCs having a speed of 750 MHz or higher and laptops with a speed of 750 MHz or higher. 
+Result set: maker
+
+Sol. SELECT distinct Maker
+     FROM Product, PC
+     WHERE Product.model = PC.model
+     AND Speed >= 750
+     AND Maker in
+                  (SELECT distinct Maker
+                   FROM Product, Laptop
+                   WHERE  Product.model = Laptop.model
+                   AND speed >= 750)
+                   
+24.                    
