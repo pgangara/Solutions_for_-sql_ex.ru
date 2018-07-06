@@ -182,4 +182,80 @@ Sol. SELECT distinct Maker
                    WHERE  Product.model = Laptop.model
                    AND speed >= 750)
                    
-24.                    
+24. List the models of any type having the highest price of all products present in the database.
+
+Sol. WITH list_model (Model, Price) as (
+                                                SELECT Model, Price  From PC 
+                                                UNION
+                                                SELECT Model, Price FROM Laptop
+                                                UNION
+                                               SELECT Model, Price From Printer 
+
+                                                 )
+     SELECT Model 
+     FROM list_model 
+     WHERE Price = ( SELECT MAX(Price)
+                            FROM list_model)
+
+25. Find the printer makers also producing PCs with the lowest RAM capacity and the highest processor speed of all PCs having the lowest RAM capacity. 
+Result set: maker.
+
+Sol. SELECT  Distinct  maker
+     FROM  Product, PC
+     WHERE  Product.model = PC.model
+     AND Ram =
+                  (SELECT  MIN(Ram)
+                   FROM PC)
+     AND  Speed =
+                      (SELECT  MAX(Speed)
+                        From PC
+                       WHERE Ram =
+                                           (SELECT  MIN(Ram)
+                                             from PC))
+    AND Maker IN
+                      (SELECT  maker
+                       FROM Product
+                       WHERE type='Printer')
+
+26. Find out the average price of PCs and laptops produced by maker A.Result set: one overall average price for all items.
+
+Sol. WITH price_select as (
+                                     SELECT Price
+                                     FROM Product, PC 
+                                     WHERE Product.Model = PC.Model
+                                     AND  Product.Maker = 'A'
+                                     UNION ALL
+                                     SELECT Price
+                                     FROM Product, Laptop
+                                     WHERE Product.Model = Laptop.Model
+                                     AND Product.Maker = 'A' 
+                                   )
+
+     SELECT AVG(PRICE) as AVG_Price
+     FROM price_select
+     
+ 27. Find out the average hard disk drive capacity of PCs produced by makers who also manufacture printers.
+Result set: maker, average HDD capacity.
+
+Sol. WITH PC_Printer AS (
+                          SELECT Prod.Maker, Prod.Model
+                          FROM Product as Prod, PC 
+                          WHERE Prod.Model = PC.Model
+                          AND Prod.Maker IN ( SELECT Prod.Maker 
+                                              FROM Product as Prod, Printer 
+                                              WHERE Prod.Model = Printer.Model
+                                            )
+                         )
+    SELECT Maker, AVG(hd)
+    FROM PC_Printer as P, PC
+    WHERE P.Model = PC.Model
+    GROUP BY Maker
+    
+28. Using Product table, find out the number of makers who produce only one model.
+
+Sol. SELECT  COUNT(*)
+     FROM Product
+     GROUP BY Maker 
+     Having COUNT(Model) = 1
+          
+
